@@ -7,7 +7,7 @@ unsigned int convert_di(va_list args, buffer_t *output,
 	unsigned int ret = 0, count = 0;
 	char pad, space = ' ', neg = '-', plus = '+';
 
-	d = (len == LONG) ? va_arg(args, long int) : va_arg(args, int);	
+	d = (len == LONG) ? va_arg(args, long int) : va_arg(args, int);
 	d = (len == SHORT) ? (short)d : d;
 
 	if (SPACE_FLAG == 1 && d >= 0)
@@ -39,6 +39,5 @@ unsigned int convert_di(va_list args, buffer_t *output,
 
 	ret += print_neg_width(output, ret, flags, wid);
 
-	return ret;
+	return (ret);
 }
-
