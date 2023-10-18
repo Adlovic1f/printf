@@ -21,8 +21,6 @@ void cleanup(va_list args, buffer_t *output)
 /**
  * run_printf - Reads through the format string for _printf.
  *
- * @buffer_t: struct containing a buffer.
- *
  * @format: Character string to print - may contain directives.
  *
  * @output: A buffer_t struct containing a buffer.
