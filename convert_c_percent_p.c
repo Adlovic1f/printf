@@ -1,86 +1,100 @@
 #include "main.h"
 
-unsigned int print_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid);
-unsigned int print_string_width(buffer_t *output,
-		unsigned char flags, int wid, int prec, int size);
-unsigned int print_neg_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid);
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
 
 /**
- * print_width - Stores leading spaces to a buffer for a width modifier.
- * @output: A buffer_t struct containing a character array.
- * @printed: The current number of characters already printed to output
- *           for a given number specifier.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- *
- * Return: The number of bytes stored to the buffer.
- */
-unsigned int print_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid)
-{
-	unsigned int ret = 0;
-	char width = ' ';
-
-	if (NEG_FLAG == 0)
-	{
-		for (wid -= printed; wid > 0;)
-			ret += _memcpy(output, &width, 1);
-	}
-
-	return (ret);
-}
-
-/**
- * print_string_width - Stores leading spaces to a buffer for a width modifier.
- * @output: A buffer_t struct containing a character array.
+ * convert_c - Converts an argument to an unsigned char and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
  * @flags: Flag modifiers.
  * @wid: A width modifier.
  * @prec: A precision modifier.
- * @size: The size of the string.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
  *
  * Return: The number of bytes stored to the buffer.
  */
-unsigned int print_string_width(buffer_t *output,
-		unsigned char flags, int wid, int prec, int size)
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
+	char c;
 	unsigned int ret = 0;
-	char width = ' ';
 
-	if (NEG_FLAG == 0)
-	{
-		wid -= (prec == -1) ? size : prec;
-		for (; wid > 0; wid--)
-			ret += _memcpy(output, &width, 1);
-	}
+	(void)prec;
+	(void)len;
+
+	c = va_arg(args, int);
+
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &c, 1);
+	ret += print_neg_width(output, ret, flags, wid);
 
 	return (ret);
 }
 
 /**
- * print_neg_width - Stores trailing spaces to a buffer for a '-' flag.
- * @output: A buffer_t struct containing a character array.
- * @printed: The current number of bytes already stored to output
- *           for a given specifier.
+ * convert_percent - Stores a percent sign to a
+ *                   buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
  * @flags: Flag modifiers.
  * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
  *
- * Return: The number of bytes stored to the buffer.
+ * Return: The number of bytes stored to the buffer (always 1).
  */
-unsigned int print_neg_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid)
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
+	char percent = '%';
 	unsigned int ret = 0;
-	char width = ' ';
 
-	if (NEG_FLAG == 1)
-	{
-		for (wid -= printed; wid > 0; wid--)
-			ret += _memcpy(output, &width, 1);
-	}
+	(void)args;
+	(void)prec;
+	(void)len;
+
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &percent, 1);
+	ret += print_neg_width(output, ret, flags, wid);
 
 	return (ret);
 }
 
+/**
+ * convert_p - Converts the address of an argument to hex and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer.
+ */
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
+{
+	char *null = "(nil)";
+	unsigned long int address;
+	unsigned int ret = 0;
 
+	(void)len;
+
+	address = va_arg(args, unsigned long int);
+	if (address == '\0')
+		return (_memcpy(output, null, 5));
+
+	flags |= 32;
+	ret += convert_ubase(output, address, "0123456789abcdef",
+			flags, wid, prec);
+	ret += print_neg_width(output, ret, flags, wid);
+
+	return (ret);
+}

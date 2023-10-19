@@ -160,6 +160,8 @@ int handle_precision(va_list args, const char *modifier, char *index)
 /**
  * handle_specifiers - Matches a conversion specifier with
  *                     a corresponding conversion function.
+ * @specifier: A pointer to a potential conversion specifier.
+ *
  * Return: If a conversion function is matched - a pointer to the function.
  *         Otherwise - NULL.
  */
@@ -193,4 +195,3 @@ unsigned int (*handle_specifiers(const char *specifier))(va_list, buffer_t *,
 
 	return (NULL);
 }
-
