@@ -29,8 +29,8 @@ int run_printf(const char *format, va_list args, buffer_t *output)
 	int i, wid, prec, ret = 0;
 	char tmp;
 	unsigned char flags, len;
-	unsigned int (*f)(va_list, buffer_t *,
-			unsigned char, int, int, unsigned char);
+	typedef unsigned char u_char;
+	unsigned int (*f)(va_list, buffer_t *, u_char, int, int, u_char);
 
 	for (i = 0; *(format + i); i++)
 	{
